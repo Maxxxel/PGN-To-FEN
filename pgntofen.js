@@ -266,6 +266,7 @@ function Init(rr)
     CurVar=0;
     MoveArray.length=0;
     BCCmds="";
+    console.log("All good so far");
     if (TargetDocument) HighlightMove("m"+MoveCount+"v"+CurVar);
     UpdateAnnotation(true);
   }
