@@ -198,307 +198,305 @@ function OpenUrl(ss)
   }
 }
 
-function Init(rr)
-{ var cc, ii, jj, kk, ll, nn, mm;
-  console.log("Init#1");
-  isInit=true;
-  if (isAutoPlay) SetAutoPlay(false);
-  if (rr!='')
-  { FenString=rr;
-    while (FenString.indexOf("|")>0) FenString=FenString.replace("|","/");
-  }
-  if (FenString=='standard')
-    FenString=StandardFen;
-    console.log("Using Standard");
-  if ((document.BoardForm)&&(document.BoardForm.FEN))
-      document.BoardForm.FEN.value=FenString;
-  console.log("Init#2");
-  if (FenString == StandardFen)
-  { for (ii=0; ii<2; ii++)
-    { PieceType[ii][0]=0;
-      PiecePosX[ii][0]=4;
-      PieceType[ii][1]=1;
-      PiecePosX[ii][1]=3;
-      PieceType[ii][2]=2;
-      PiecePosX[ii][2]=0;
-      PieceType[ii][3]=2;
-      PiecePosX[ii][3]=7;
-      PieceType[ii][4]=3;
-      PiecePosX[ii][4]=2;
-      PieceType[ii][5]=3;
-      PiecePosX[ii][5]=5;
-      PieceType[ii][6]=4;
-      PiecePosX[ii][6]=1;
-      PieceType[ii][7]=4;
-      PiecePosX[ii][7]=6;
-      for (jj=0; jj<8; jj++)
-      { PieceType[ii][jj+8]=5;
-        PiecePosX[ii][jj+8]=jj;
-      }
-      for (jj=0; jj<16; jj++)
-      { PieceMoves[ii][jj]=0;
-        PiecePosY[ii][jj]=(1-ii)*Math.floor(jj/8)+ii*(7-Math.floor(jj/8));
-      }
+function Init(rr) { 
+    var cc, ii, jj, kk, ll, nn, mm;
+    isInit=true;
+    if (isAutoPlay) SetAutoPlay(false);
+    if (rr!='') {
+        FenString=rr;
+        while (FenString.indexOf("|")>0) FenString=FenString.replace("|","/");
     }
-    for (ii=0; ii<8; ii++)
-    { for (jj=0; jj<8; jj++) Board[ii][jj]=0;
-    }
-    for (ii=0; ii<2; ii++)
-    { for (jj=0; jj<16; jj++)
-        Board[PiecePosX[ii][jj]][PiecePosY[ii][jj]]=(PieceType[ii][jj]+1)*(1-2*ii);
-    }
-    for (ii=0; ii<2; ii++)
-    { for (jj=0; jj<2; jj++)
-        Castling[ii][jj]=1;
-    }
-    EnPass=-1;
-    HalfMove[0]=0;
-    if (document.BoardForm)
-    { RefreshBoard();
-      if (document.BoardForm.Position)
-        document.BoardForm.Position.value="";
-      if (nAudio) PlayAudio("",0);
-      NewCommands.length=0;
-      ExecCommands();
-    }
-    StartMove=0;
-    MoveCount=StartMove;
-    MoveType=StartMove%2;
-    SetBoardClicked(-1);
-    RecordCount=0;
-    CurVar=0;
-    MoveArray.length=0;
-    BCCmds="";
-    console.log("All good so far");
-    if (TargetDocument) HighlightMove("m"+MoveCount+"v"+CurVar);
-    UpdateAnnotation(true);
-  }
-  else
-  { for (ii=0; ii<2; ii++)
-    { for (jj=0; jj<16; jj++)
-      { PieceType[ii][jj]=-1;
-        PiecePosX[ii][jj]=0;
-        PiecePosY[ii][jj]=0;
-        PieceMoves[ii][jj]=0;
-      }
-    }
-    ii=0; jj=7; ll=0; nn=1; mm=1; cc=FenString.charAt(ll++);
-    while (cc!=" ")
-    { if (cc=="/")
-      { if (ii!=8)
-        { alert("Invalid FEN [1]: char "+ll+" in "+FenString);
-          Init('standard');
-          return;
-        }
-        ii=0;
-        jj--;
-      }
-      if (ii==8) 
-      { alert("Invalid FEN [2]: char "+ll+" in "+FenString);
-        Init('standard');
-        return;
-      }
-      if (! isNaN(cc))
-      { ii+=parseInt(cc);
-        if ((ii<0)||(ii>8))
-        { alert("Invalid FEN [3]: char "+ll+" in "+FenString);
-          Init('standard');
-          return;
-        }
-      }
-      if (cc.charCodeAt(0)==PieceName.toUpperCase().charCodeAt(0))
-      { if (PieceType[0][0]!=-1)
-        { alert("Invalid FEN [4]: char "+ll+" in "+FenString);
-          Init('standard');
-          return;
-        }     
-        PieceType[0][0]=0;
-        PiecePosX[0][0]=ii;
-        PiecePosY[0][0]=jj;
-        ii++;
-      }
-      if (cc.charCodeAt(0)==PieceName.toLowerCase().charCodeAt(0))
-      { if (PieceType[1][0]!=-1)
-        { alert("Invalid FEN [5]: char "+ll+" in "+FenString);
-          Init('standard');
-          return;
-        }  
-        PieceType[1][0]=0;
-        PiecePosX[1][0]=ii;
-        PiecePosY[1][0]=jj;
-        ii++;
-      }
-      for (kk=1; kk<6; kk++)
-      { if (cc.charCodeAt(0)==PieceName.toUpperCase().charCodeAt(kk))
-        { if (nn==16)
-          { alert("Invalid FEN [6]: char "+ll+" in "+FenString);
-            Init('standard');
-            return;
-          }          
-          PieceType[0][nn]=kk;
-          PiecePosX[0][nn]=ii;
-          PiecePosY[0][nn]=jj;
-          nn++;
-          ii++;
-        }
-        if (cc.charCodeAt(0)==PieceName.toLowerCase().charCodeAt(kk))
-        { if (mm==16)
-          { alert("Invalid FEN [7]: char "+ll+" in "+FenString);
-            Init('standard');
-            return;
-          }  
-          PieceType[1][mm]=kk;
-          PiecePosX[1][mm]=ii;
-          PiecePosY[1][mm]=jj;
-          mm++;
-          ii++;
-        }
-      }
-      if (ll<FenString.length)
-        cc=FenString.charAt(ll++);
-      else cc=" ";
-    }
-    if ((ii!=8)||(jj!=0))
-    { alert("Invalid FEN [8]: char "+ll+" in "+FenString);
-      Init('standard');
-      return;
-    }
-    if ((PieceType[0][0]==-1)||(PieceType[1][0]==-1))
-    { alert("Invalid FEN [9]: char "+ll+" missing king");
-      Init('standard');
-      return;
-    }
-    if (ll==FenString.length)
-    { FenString+=" w ";
-      FenString+=PieceName.toUpperCase().charAt(0);
-      FenString+=PieceName.toUpperCase().charAt(1);
-      FenString+=PieceName.toLowerCase().charAt(0);
-      FenString+=PieceName.toLowerCase().charAt(1);      
-      FenString+=" - 0 1";
-      ll++;
-    }
-//    { alert("Invalid FEN [10]: char "+ll+" missing active color");
-//      Init('standard');
-//      return;
-//    }
-    cc=FenString.charAt(ll++);
-    if ((cc=="w")||(cc=="b"))
-    { if (cc=="w") StartMove=0;
-      else StartMove=1;
-    }
-    else
-    { alert("Invalid FEN [11]: char "+ll+" invalid active color");
-      Init('standard');
-      return;
-    }
-    ll++;
-    if (ll>=FenString.length)
-    { alert("Invalid FEN [12]: char "+ll+" missing castling availability");
-      Init('standard');
-      return;
-    }
-    Castling[0][0]=0; Castling[0][1]=0; Castling[1][0]=0; Castling[1][1]=0;
-    cc=FenString.charAt(ll++);
-    while (cc!=" ")
-    { cc=cc.charCodeAt(0);
-      if (cc==PieceName.toUpperCase().charCodeAt(0))
-        Castling[0][0]=1; 
-      if (cc==PieceName.toUpperCase().charCodeAt(1))
-        Castling[0][1]=1; 
-      if (cc==PieceName.toLowerCase().charCodeAt(0))
-        Castling[1][0]=1; 
-      if (cc==PieceName.toLowerCase().charCodeAt(1))
-        Castling[1][1]=1;
-      if ((cc>=65)&&(cc<=72)) //A...H  for Chess960
-      { if (cc>PiecePosX[0][0]+65) Castling[0][0]=1;
-        if (cc<PiecePosX[0][0]+65) Castling[0][1]=1;
-      }
-      if ((cc>=97)&&(cc<=104)) //a...h  for Chess960
-      { if (cc>PiecePosX[1][0]+97) Castling[1][0]=1;
-        if (cc<PiecePosX[1][0]+97) Castling[1][1]=1;
-      }
-      if (ll<FenString.length)
-        cc=FenString.charAt(ll++);
-      else cc=" ";
-    }
-    if (ll==FenString.length)
-    { alert("Invalid FEN [13]: char "+ll+" missing en passant target square");
-      Init('standard');
-      return;
-    }
-    EnPass=-1;
-    cc=FenString.charAt(ll++);
-    while (cc!=" ")
-    { if ((cc.charCodeAt(0)-97>=0)&&(cc.charCodeAt(0)-97<=7))
-        EnPass=cc.charCodeAt(0)-97; 
-      if (ll<FenString.length)
-        cc=FenString.charAt(ll++);
-      else cc=" ";
-    }
-    if (ll==FenString.length)
-    { alert("Invalid FEN [14]: char "+ll+" missing halfmove clock");
-      Init('standard');
-      return;
-    }
-    HalfMove[0]=0;
-    cc=FenString.charAt(ll++);
-    while (cc!=" ")
-    { if (isNaN(cc))
-      { alert("Invalid FEN [15]: char "+ll+" invalid halfmove clock");
-        Init('standard');
-        return;
-      }
-      HalfMove[0]=HalfMove[0]*10+parseInt(cc);
-      if (ll<FenString.length)
-        cc=FenString.charAt(ll++);
-      else cc=" ";
-    }
-    if (ll==FenString.length)
-    { alert("Invalid FEN [16]: char "+ll+" missing fullmove number");
-      Init('standard');
-      return;
-    }
-    cc=FenString.substring(ll++);
-    if (isNaN(cc))
-    { alert("Invalid FEN [17]: char "+ll+" invalid fullmove number");
-      Init('standard');
-      return;
-    }
-    if (cc<=0)
-    { alert("Invalid FEN [18]: char "+ll+" invalid fullmove number");
-      Init('standard');
-      return;
-    }
-    StartMove+=2*(parseInt(cc)-1);
-    for (ii=0; ii<8; ii++)
-    { for (jj=0; jj<8; jj++) Board[ii][jj]=0;
-    }
-    for (ii=0; ii<2; ii++)
-    { for (jj=0; jj<16; jj++)
-      { if (PieceType[ii][jj]!=-1) 
-          Board[PiecePosX[ii][jj]][PiecePosY[ii][jj]]=(PieceType[ii][jj]+1)*(1-2*ii);
-      }
-    }
-    if (document.BoardForm)
-    { RefreshBoard();
-      if (document.BoardForm.Position)
-      { if (StartMove%2==0) document.BoardForm.Position.value="white to move";
-        else document.BoardForm.Position.value="black to move";
-      }
-      if (nAudio) PlayAudio("",0);
-      NewCommands.length=0;
-      ExecCommands();
-    }
-    MoveCount=StartMove;
-    MoveType=StartMove%2;
-    SetBoardClicked(-1);
-    RecordCount=0;
-    CurVar=0;
-    MoveArray.length=0;
-    BCCmds="";
-    if (TargetDocument) HighlightMove("m"+MoveCount+"v"+CurVar);
-    UpdateAnnotation(true);
-  }
+    console.log(FenString)
+//   if (FenString=='standard')
+//     FenString=StandardFen;
+//   if ((document.BoardForm)&&(document.BoardForm.FEN))
+//       document.BoardForm.FEN.value=FenString;
+//   if (FenString == StandardFen)
+//   { for (ii=0; ii<2; ii++)
+//     { PieceType[ii][0]=0;
+//       PiecePosX[ii][0]=4;
+//       PieceType[ii][1]=1;
+//       PiecePosX[ii][1]=3;
+//       PieceType[ii][2]=2;
+//       PiecePosX[ii][2]=0;
+//       PieceType[ii][3]=2;
+//       PiecePosX[ii][3]=7;
+//       PieceType[ii][4]=3;
+//       PiecePosX[ii][4]=2;
+//       PieceType[ii][5]=3;
+//       PiecePosX[ii][5]=5;
+//       PieceType[ii][6]=4;
+//       PiecePosX[ii][6]=1;
+//       PieceType[ii][7]=4;
+//       PiecePosX[ii][7]=6;
+//       for (jj=0; jj<8; jj++)
+//       { PieceType[ii][jj+8]=5;
+//         PiecePosX[ii][jj+8]=jj;
+//       }
+//       for (jj=0; jj<16; jj++)
+//       { PieceMoves[ii][jj]=0;
+//         PiecePosY[ii][jj]=(1-ii)*Math.floor(jj/8)+ii*(7-Math.floor(jj/8));
+//       }
+//     }
+//     for (ii=0; ii<8; ii++)
+//     { for (jj=0; jj<8; jj++) Board[ii][jj]=0;
+//     }
+//     for (ii=0; ii<2; ii++)
+//     { for (jj=0; jj<16; jj++)
+//         Board[PiecePosX[ii][jj]][PiecePosY[ii][jj]]=(PieceType[ii][jj]+1)*(1-2*ii);
+//     }
+//     for (ii=0; ii<2; ii++)
+//     { for (jj=0; jj<2; jj++)
+//         Castling[ii][jj]=1;
+//     }
+//     EnPass=-1;
+//     HalfMove[0]=0;
+//     if (document.BoardForm)
+//     { RefreshBoard();
+//       if (document.BoardForm.Position)
+//         document.BoardForm.Position.value="";
+//       if (nAudio) PlayAudio("",0);
+//       NewCommands.length=0;
+//       ExecCommands();
+//     }
+//     StartMove=0;
+//     MoveCount=StartMove;
+//     MoveType=StartMove%2;
+//     SetBoardClicked(-1);
+//     RecordCount=0;
+//     CurVar=0;
+//     MoveArray.length=0;
+//     BCCmds="";
+//     console.log("All good so far");
+//     if (TargetDocument) HighlightMove("m"+MoveCount+"v"+CurVar);
+//     UpdateAnnotation(true);
+//   }
+//   else
+//   { for (ii=0; ii<2; ii++)
+//     { for (jj=0; jj<16; jj++)
+//       { PieceType[ii][jj]=-1;
+//         PiecePosX[ii][jj]=0;
+//         PiecePosY[ii][jj]=0;
+//         PieceMoves[ii][jj]=0;
+//       }
+//     }
+//     ii=0; jj=7; ll=0; nn=1; mm=1; cc=FenString.charAt(ll++);
+//     while (cc!=" ")
+//     { if (cc=="/")
+//       { if (ii!=8)
+//         { alert("Invalid FEN [1]: char "+ll+" in "+FenString);
+//           Init('standard');
+//           return;
+//         }
+//         ii=0;
+//         jj--;
+//       }
+//       if (ii==8) 
+//       { alert("Invalid FEN [2]: char "+ll+" in "+FenString);
+//         Init('standard');
+//         return;
+//       }
+//       if (! isNaN(cc))
+//       { ii+=parseInt(cc);
+//         if ((ii<0)||(ii>8))
+//         { alert("Invalid FEN [3]: char "+ll+" in "+FenString);
+//           Init('standard');
+//           return;
+//         }
+//       }
+//       if (cc.charCodeAt(0)==PieceName.toUpperCase().charCodeAt(0))
+//       { if (PieceType[0][0]!=-1)
+//         { alert("Invalid FEN [4]: char "+ll+" in "+FenString);
+//           Init('standard');
+//           return;
+//         }     
+//         PieceType[0][0]=0;
+//         PiecePosX[0][0]=ii;
+//         PiecePosY[0][0]=jj;
+//         ii++;
+//       }
+//       if (cc.charCodeAt(0)==PieceName.toLowerCase().charCodeAt(0))
+//       { if (PieceType[1][0]!=-1)
+//         { alert("Invalid FEN [5]: char "+ll+" in "+FenString);
+//           Init('standard');
+//           return;
+//         }  
+//         PieceType[1][0]=0;
+//         PiecePosX[1][0]=ii;
+//         PiecePosY[1][0]=jj;
+//         ii++;
+//       }
+//       for (kk=1; kk<6; kk++)
+//       { if (cc.charCodeAt(0)==PieceName.toUpperCase().charCodeAt(kk))
+//         { if (nn==16)
+//           { alert("Invalid FEN [6]: char "+ll+" in "+FenString);
+//             Init('standard');
+//             return;
+//           }          
+//           PieceType[0][nn]=kk;
+//           PiecePosX[0][nn]=ii;
+//           PiecePosY[0][nn]=jj;
+//           nn++;
+//           ii++;
+//         }
+//         if (cc.charCodeAt(0)==PieceName.toLowerCase().charCodeAt(kk))
+//         { if (mm==16)
+//           { alert("Invalid FEN [7]: char "+ll+" in "+FenString);
+//             Init('standard');
+//             return;
+//           }  
+//           PieceType[1][mm]=kk;
+//           PiecePosX[1][mm]=ii;
+//           PiecePosY[1][mm]=jj;
+//           mm++;
+//           ii++;
+//         }
+//       }
+//       if (ll<FenString.length)
+//         cc=FenString.charAt(ll++);
+//       else cc=" ";
+//     }
+//     if ((ii!=8)||(jj!=0))
+//     { alert("Invalid FEN [8]: char "+ll+" in "+FenString);
+//       Init('standard');
+//       return;
+//     }
+//     if ((PieceType[0][0]==-1)||(PieceType[1][0]==-1))
+//     { alert("Invalid FEN [9]: char "+ll+" missing king");
+//       Init('standard');
+//       return;
+//     }
+//     if (ll==FenString.length)
+//     { FenString+=" w ";
+//       FenString+=PieceName.toUpperCase().charAt(0);
+//       FenString+=PieceName.toUpperCase().charAt(1);
+//       FenString+=PieceName.toLowerCase().charAt(0);
+//       FenString+=PieceName.toLowerCase().charAt(1);      
+//       FenString+=" - 0 1";
+//       ll++;
+//     }
+// //    { alert("Invalid FEN [10]: char "+ll+" missing active color");
+// //      Init('standard');
+// //      return;
+// //    }
+//     cc=FenString.charAt(ll++);
+//     if ((cc=="w")||(cc=="b"))
+//     { if (cc=="w") StartMove=0;
+//       else StartMove=1;
+//     }
+//     else
+//     { alert("Invalid FEN [11]: char "+ll+" invalid active color");
+//       Init('standard');
+//       return;
+//     }
+//     ll++;
+//     if (ll>=FenString.length)
+//     { alert("Invalid FEN [12]: char "+ll+" missing castling availability");
+//       Init('standard');
+//       return;
+//     }
+//     Castling[0][0]=0; Castling[0][1]=0; Castling[1][0]=0; Castling[1][1]=0;
+//     cc=FenString.charAt(ll++);
+//     while (cc!=" ")
+//     { cc=cc.charCodeAt(0);
+//       if (cc==PieceName.toUpperCase().charCodeAt(0))
+//         Castling[0][0]=1; 
+//       if (cc==PieceName.toUpperCase().charCodeAt(1))
+//         Castling[0][1]=1; 
+//       if (cc==PieceName.toLowerCase().charCodeAt(0))
+//         Castling[1][0]=1; 
+//       if (cc==PieceName.toLowerCase().charCodeAt(1))
+//         Castling[1][1]=1;
+//       if ((cc>=65)&&(cc<=72)) //A...H  for Chess960
+//       { if (cc>PiecePosX[0][0]+65) Castling[0][0]=1;
+//         if (cc<PiecePosX[0][0]+65) Castling[0][1]=1;
+//       }
+//       if ((cc>=97)&&(cc<=104)) //a...h  for Chess960
+//       { if (cc>PiecePosX[1][0]+97) Castling[1][0]=1;
+//         if (cc<PiecePosX[1][0]+97) Castling[1][1]=1;
+//       }
+//       if (ll<FenString.length)
+//         cc=FenString.charAt(ll++);
+//       else cc=" ";
+//     }
+//     if (ll==FenString.length)
+//     { alert("Invalid FEN [13]: char "+ll+" missing en passant target square");
+//       Init('standard');
+//       return;
+//     }
+//     EnPass=-1;
+//     cc=FenString.charAt(ll++);
+//     while (cc!=" ")
+//     { if ((cc.charCodeAt(0)-97>=0)&&(cc.charCodeAt(0)-97<=7))
+//         EnPass=cc.charCodeAt(0)-97; 
+//       if (ll<FenString.length)
+//         cc=FenString.charAt(ll++);
+//       else cc=" ";
+//     }
+//     if (ll==FenString.length)
+//     { alert("Invalid FEN [14]: char "+ll+" missing halfmove clock");
+//       Init('standard');
+//       return;
+//     }
+//     HalfMove[0]=0;
+//     cc=FenString.charAt(ll++);
+//     while (cc!=" ")
+//     { if (isNaN(cc))
+//       { alert("Invalid FEN [15]: char "+ll+" invalid halfmove clock");
+//         Init('standard');
+//         return;
+//       }
+//       HalfMove[0]=HalfMove[0]*10+parseInt(cc);
+//       if (ll<FenString.length)
+//         cc=FenString.charAt(ll++);
+//       else cc=" ";
+//     }
+//     if (ll==FenString.length)
+//     { alert("Invalid FEN [16]: char "+ll+" missing fullmove number");
+//       Init('standard');
+//       return;
+//     }
+//     cc=FenString.substring(ll++);
+//     if (isNaN(cc))
+//     { alert("Invalid FEN [17]: char "+ll+" invalid fullmove number");
+//       Init('standard');
+//       return;
+//     }
+//     if (cc<=0)
+//     { alert("Invalid FEN [18]: char "+ll+" invalid fullmove number");
+//       Init('standard');
+//       return;
+//     }
+//     StartMove+=2*(parseInt(cc)-1);
+//     for (ii=0; ii<8; ii++)
+//     { for (jj=0; jj<8; jj++) Board[ii][jj]=0;
+//     }
+//     for (ii=0; ii<2; ii++)
+//     { for (jj=0; jj<16; jj++)
+//       { if (PieceType[ii][jj]!=-1) 
+//           Board[PiecePosX[ii][jj]][PiecePosY[ii][jj]]=(PieceType[ii][jj]+1)*(1-2*ii);
+//       }
+//     }
+//     if (document.BoardForm)
+//     { RefreshBoard();
+//       if (document.BoardForm.Position)
+//       { if (StartMove%2==0) document.BoardForm.Position.value="white to move";
+//         else document.BoardForm.Position.value="black to move";
+//       }
+//       if (nAudio) PlayAudio("",0);
+//       NewCommands.length=0;
+//       ExecCommands();
+//     }
+//     MoveCount=StartMove;
+//     MoveType=StartMove%2;
+//     SetBoardClicked(-1);
+//     RecordCount=0;
+//     CurVar=0;
+//     MoveArray.length=0;
+//     BCCmds="";
+//     if (TargetDocument) HighlightMove("m"+MoveCount+"v"+CurVar);
+//     UpdateAnnotation(true);
+//   }
 }
 
 function MoveBack(nn)
