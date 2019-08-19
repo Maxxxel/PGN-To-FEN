@@ -200,6 +200,7 @@ function OpenUrl(ss)
 
 function Init(rr)
 { var cc, ii, jj, kk, ll, nn, mm;
+  console.log("Init#1");
   isInit=true;
   if (isAutoPlay) SetAutoPlay(false);
   if (rr!='')
@@ -211,6 +212,7 @@ function Init(rr)
     console.log("Using Standard");
   if ((document.BoardForm)&&(document.BoardForm.FEN))
       document.BoardForm.FEN.value=FenString;
+  console.log("Init#2");
   if (FenString == StandardFen)
   { for (ii=0; ii<2; ii++)
     { PieceType[ii][0]=0;
