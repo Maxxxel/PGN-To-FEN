@@ -208,6 +208,7 @@ function Init(rr)
   }
   if (FenString=='standard')
     FenString=StandardFen;
+    console.log("Using Standard");
   if ((document.BoardForm)&&(document.BoardForm.FEN))
       document.BoardForm.FEN.value=FenString;
   if (FenString == StandardFen)
